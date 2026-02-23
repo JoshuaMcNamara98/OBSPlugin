@@ -75,6 +75,10 @@ runs:
           Set-PSDebug -Trace 1
         }
 
+        # Set CMake to find Qt headers
+        $Env:CMAKE_PREFIX_PATH = "D:\a\OBSPlugin\Qt\6.6.0\msvc2019_64\lib\cmake"
+        Write-Host "CMAKE_PREFIX_PATH = $Env:CMAKE_PREFIX_PATH"
+
         $BuildArgs = @{
           Target = '${{ inputs.target }}'
           Configuration = '${{ inputs.config }}'
