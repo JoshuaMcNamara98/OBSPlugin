@@ -99,6 +99,12 @@ jobs:
           "pluginName=${ProductName}" >> $env:GITHUB_OUTPUT
           "pluginVersion=${ProductVersion}" >> $env:GITHUB_OUTPUT
 
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.6.0'
+          arch: win64_msvc2019_64
+
       - name: Build Plugin 🧱
         uses: ./.github/actions/build-plugin
         with:
