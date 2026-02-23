@@ -84,14 +84,26 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Download and Extract Qt6
+      - name: Install Qt6 with Qt Online Installer
         shell: pwsh
         run: |
-          $qtUrl = "https://download.qt.io/official_releases/qt/6.6/6.6.0/qt6_6.6.0-windows-x64-msvc2019_64.7z"
-          $qtArchive = "$env:RUNNER_TEMP\qt6.7z"
-          $qtDir = "$env:RUNNER_TEMP\Qt6"
-          Invoke-WebRequest -Uri $qtUrl -OutFile $qtArchive
-          7z x $qtArchive -o$qtDir | Out-Null
+          $qtInstallerUrl = "https://download.qt.io/official_releases/online_installers/qt-unified-windows-x64-online.exe"
+          $qtInstallerPath = "$env:RUNNER_TEMP\qt-installer.exe"
+          $qtInstallDir = "$env:RUNNER_TEMP\Qt6"
+          Invoke-WebRequest -Uri $qtInstallerUrl -OutFile $qtInstallerPath
+          # Create a Qt installer script
+          $script = @"
+          --root "$qtInstallDir"
+          --accept-licenses
+          --confirm-command
+          --verbose
+          --platform minimal
+          --modules qt.qt6.660.win64_msvc2019_64,qt.qt6.660.win64_msvc2019_64.qtbase,qt.qt6.660.win64_msvc2019_64.qttools,qt.qt6.660.win64_msvc2019_64.qtnetworkauth,qt.qt6.660.win64_msvc2019_64.qtsvg,qt.qt6.660.win64_msvc2019_64.qtdeclarative
+          "@
+          $scriptPath = "$env:RUNNER_TEMP\qt-installer-script.txt"
+          $script | Set-Content -Path $scriptPath
+          Start-Process -FilePath $qtInstallerPath -ArgumentList "--script", $scriptPath, "--silent" -Wait
+          $qtDir = Get-ChildItem -Path $qtInstallDir -Directory | Select-Object -First 1 | ForEach-Object { $_.FullName }
           echo "QT6DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "CMAKE_PREFIX_PATH=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "QTDIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
