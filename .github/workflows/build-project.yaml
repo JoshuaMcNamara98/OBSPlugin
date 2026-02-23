@@ -91,7 +91,6 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2019_64'
-          modules: 'qttools qtsvg qtdeclarative qtnetworkauth'
 
       - name: Set Up Environment 🔧
         id: setup
