@@ -1,5 +1,3 @@
-
-#include <QDialog>
 #include <QMessageBox>
 #include <QString>
 #include <QTcpSocket>
@@ -10,6 +8,7 @@
 #include <QInputDialog>
 
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include "aboutus.h"
 //newly added 07/19
 #include "xboxhelp.h"
@@ -19,7 +18,6 @@
 #include "multicameras.h"
 #include "joystickdlg.h"
 
-#include "ui_mainwindow.h"
 
 
 //QLabel *panStatus, *tiltStatus, *zoomStatus , *focusStatus , *shutterStatus, *irisStatus , *brightStatus , *onlineStatus , *hueStatus , *luminanceStatus , *contrastStatus /*,*rGainStatus , *bGainStatus*/;
@@ -893,12 +891,8 @@ void MainWindow::onPanTiltLimitSettingClicked()
 }
 void MainWindow::onXboxHelpClicked()
 {
-// TODO: fix and uncomment
-#if 0
     XBoxHelp xboxHelp;
     xboxHelp.exec();
-    #endif //0
-    
 }
 void MainWindow::onHotkeyHelpClicked()
 {
@@ -1245,6 +1239,7 @@ void MainWindow::onFocusSpeedChanged(int index)
 void MainWindow::onZoomSpeedChanged(int index)
 {
     setSettings(currentCamIp , SETTING_KEY_ZOOMSPEED , index);
+    joystick->setZoomSpeed(index);
 }
 void MainWindow::onPanSpeedChanged(int index)
 {
@@ -1563,7 +1558,7 @@ void MainWindow::onOnePushTriggerBtnClicked()
     //8101041005FF
     if(isControllable)
     {
-        uint8_t command[6];
+        char command[6];
         command[0] = 0x81;
         command[1] = 0x01;
         command[2] = 0x04;
@@ -1748,7 +1743,7 @@ void MainWindow::initConnection()
 void MainWindow::focusLock(bool lock)
 {
     //81 0a 04 68 02 FF//lock 02 unlock 03
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x0a;
     command[2] = 0x04;
@@ -1767,7 +1762,7 @@ void MainWindow::setPanTiltLimit(int panLeftLimit, int panRightLimit, int tiltDo
     //    YYYY: Pan Limit Position | F670 (left) to 0990 (right)
     //    ZZZZ: Tilt Limit Position | FAFO (down) to 0510 (up)
         //following code is very correct do not change
-        uint8_t command[15];
+        char command[15];
         command[0] = 0x81;
         command[1] = 0x01;
         command[2] = 0x06;
@@ -1785,7 +1780,7 @@ void MainWindow::setPanTiltLimit(int panLeftLimit, int panRightLimit, int tiltDo
         command[14] = 0xff;
         addToQue(command , 15 , Command);
 
-        uint8_t command1[15];
+        char command1[15];
         command1[0] = 0x81;
         command1[1] = 0x01;
         command1[2] = 0x06;
@@ -1805,7 +1800,7 @@ void MainWindow::setPanTiltLimit(int panLeftLimit, int panRightLimit, int tiltDo
 }
 void MainWindow::clearLimits(bool upright)
 {
-    uint8_t command[15];
+    char command[15];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -1830,7 +1825,7 @@ void MainWindow::setCallPresetSpeed(int speed)
 {
     //81 01 06 01 pp FF
     speed = speed % 0x18 + 1;
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -1847,7 +1842,7 @@ void MainWindow::presetSpeedSet(int index)
 {
     //81 01 06 01 p FF
     index ++;
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -1859,7 +1854,7 @@ void MainWindow::presetSpeedSet(int index)
 void MainWindow::setLuminance(int pos)
 {
     //81 01 04 A1 00 00 0p 0q FF
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1875,7 +1870,7 @@ void MainWindow::setLuminance(int pos)
 }
 void MainWindow::setContrast(int pos)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1891,7 +1886,7 @@ void MainWindow::setContrast(int pos)
 }
 void MainWindow::setHue(int pos)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1906,7 +1901,7 @@ void MainWindow::setHue(int pos)
 void MainWindow::setRGain(int pos)
 {
     //81 01 04 43 00 00 0p 0q FF
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1922,7 +1917,7 @@ void MainWindow::setRGain(int pos)
 void MainWindow::setBGain(int pos)
 {
     //81 01 04 44 00 00 0p 0q FF
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1938,7 +1933,7 @@ void MainWindow::setBGain(int pos)
 void MainWindow::osdMenuToggle()
 {
     //81 01 04 3F 02 5F FF
-    uint8_t command[7];
+    char command[7];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1952,7 +1947,7 @@ void MainWindow::osdMenuToggle()
 void MainWindow::osdMenuEnter()
 {
     //81 01 06 06 05 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -1963,7 +1958,7 @@ void MainWindow::osdMenuEnter()
 }
 void MainWindow::osdMenuBack()
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -1977,7 +1972,7 @@ void MainWindow::imageFlip()
 {
 
     //81 01 04 66 02 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -1993,7 +1988,7 @@ void MainWindow::imageFlip()
 void MainWindow::imageMirror()
 {
     //81 01 04 61 02 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2008,7 +2003,7 @@ void MainWindow::imageMirror()
 void MainWindow::irisUpClicked()
 {
     //8x 01 04 0B 02 FF
-//    uint8_t command[6];
+//    char command[6];
 //    command[0] = 0x81;
 //    command[1] = 0x01;
 //    command[2] = 0x04;
@@ -2025,7 +2020,7 @@ void MainWindow::irisUpClicked()
 void MainWindow::irisDownClicked()
 {
     //8x 01 04 0B 03 FF
-//    uint8_t command[6];
+//    char command[6];
 //    command[0] = 0x81;
 //    command[1] = 0x01;
 //    command[2] = 0x04;
@@ -2041,7 +2036,7 @@ void MainWindow::irisDownClicked()
 void MainWindow::irisResetClicked()
 {
     //8x 01 04 0B 00 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2053,7 +2048,7 @@ void MainWindow::irisResetClicked()
 void MainWindow::irisComboChanged(int index)
 {
     //81 01 04 4B 00 00 0p 0q FF
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2068,7 +2063,7 @@ void MainWindow::irisComboChanged(int index)
 void MainWindow::shutterUpClicked()
 {
     //81 01 04 0A 02 FF
-//    uint8_t command[6];
+//    char command[6];
 //    command[0] = 0x81;
 //    command[1] = 0x01;
 //    command[2] = 0x04;
@@ -2085,7 +2080,7 @@ void MainWindow::shutterUpClicked()
 void MainWindow::shutterDownClicked()
 {
     //81 01 04 0A 03 FF
-//    uint8_t command[6];
+//    char command[6];
 //    command[0] = 0x81;
 //    command[1] = 0x01;
 //    command[2] = 0x04;
@@ -2102,7 +2097,7 @@ void MainWindow::shutterResetClicked()
 {
     //81 01 04 0A 00 FF
 
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2114,7 +2109,7 @@ void MainWindow::shutterResetClicked()
 void MainWindow::shutterComboChanged(int index)
 {
     //81 01 04 4A 00 00 0p 0q FF
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2129,7 +2124,7 @@ void MainWindow::shutterComboChanged(int index)
 void MainWindow::brightUpClicked()
 {
     //8x 01 04 0D 02 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2142,7 +2137,7 @@ void MainWindow::brightUpClicked()
 void MainWindow::brightDownClicked()
 {
     //8x 01 04 0D 03 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2154,7 +2149,7 @@ void MainWindow::brightDownClicked()
 void MainWindow::brightResetClicked()
 {
     //8x 01 04 0D 00 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2166,7 +2161,7 @@ void MainWindow::brightResetClicked()
 void MainWindow::brightComboChanged(int index)
 {
     //81 01 04 0d 00 00 0p 0q FF//only executed not affect
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2181,7 +2176,7 @@ void MainWindow::brightComboChanged(int index)
 }
 void MainWindow::aeModeSelected(int index)
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2213,7 +2208,7 @@ void MainWindow::aeModeSelected(int index)
 }
 void MainWindow::wbModeSelected(int index)
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2248,7 +2243,7 @@ void MainWindow::setPreset(int index)
 {
     if (index == 10)//this should saved on camera...
     {
-	uint8_t command[7];
+        char command[7];
         command[0] = 0x81;
         command[1] = 0x01;
         command[2] = 0x04;
@@ -2260,7 +2255,7 @@ void MainWindow::setPreset(int index)
     }
     else
     {
-	uint8_t command[7];
+        char command[7];
         command[0] = 0x81;
         command[1] = 0x01;
         command[2] = 0x04;
@@ -2276,7 +2271,7 @@ void MainWindow::setPreset(int index)
 }
 void MainWindow::recallPreset(int index)
 {
-    uint8_t command[7];
+    char command[7];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2288,7 +2283,7 @@ void MainWindow::recallPreset(int index)
 }
 void MainWindow::setAbsolutPanTilt(char *pan, char *tilt)
 {
-    uint8_t command[15];
+    char command[15];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2310,7 +2305,7 @@ void MainWindow::setAbsolutPanTilt(char *pan, char *tilt)
 }
 void MainWindow::setDirectZoomFocus(char *zoom, char *focus)
 {
-    uint8_t command[13];
+    char command[13];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2328,7 +2323,7 @@ void MainWindow::setDirectZoomFocus(char *zoom, char *focus)
 }
 void MainWindow::setDirectZoom(char *zoom)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2346,7 +2341,7 @@ void MainWindow::setDirectZoom(char *zoom)
 }
 void MainWindow::setDirectFocus(char *focus)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2360,7 +2355,7 @@ void MainWindow::setDirectFocus(char *focus)
 }
 void MainWindow::focusInOnce(int focusSpeed)
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2371,7 +2366,7 @@ void MainWindow::focusInOnce(int focusSpeed)
 }
 void MainWindow::focusOutOnce(int focusSpeed)
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2384,7 +2379,7 @@ void MainWindow::focusOutOnce(int focusSpeed)
 void MainWindow::stopFocusing()
 {
     //8x 01 04 08 00 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2398,7 +2393,7 @@ void MainWindow::autoFocusChange(bool isChecked)
     ui->focusIn->setEnabled(!isChecked);
     ui->focusOut->setEnabled(!isChecked);
     //8x 01 04 38 02 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2412,7 +2407,7 @@ void MainWindow::autoFocusChange(bool isChecked)
 }
 void MainWindow::angleUpLeft(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2426,7 +2421,7 @@ void MainWindow::angleUpLeft(int panSpeed, int tiltSpeed)
 }
 void MainWindow::angleUpRight(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2440,7 +2435,7 @@ void MainWindow::angleUpRight(int panSpeed, int tiltSpeed)
 }
 void MainWindow::angleDownLeft(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2454,7 +2449,7 @@ void MainWindow::angleDownLeft(int panSpeed, int tiltSpeed)
 }
 void MainWindow::angleDownRight(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2469,7 +2464,7 @@ void MainWindow::angleDownRight(int panSpeed, int tiltSpeed)
 void MainWindow::osdMenuChange(int index)
 {
     //8x 01 06 06 03 FF
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2483,7 +2478,7 @@ void MainWindow::osdMenuChange(int index)
 }
 void MainWindow::moveTopOnce(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2497,7 +2492,7 @@ void MainWindow::moveTopOnce(int panSpeed, int tiltSpeed)
 }
 void MainWindow::moveLeftOnce(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2511,7 +2506,7 @@ void MainWindow::moveLeftOnce(int panSpeed, int tiltSpeed)
 }
 void MainWindow::moveBottomOnce(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2525,7 +2520,7 @@ void MainWindow::moveBottomOnce(int panSpeed, int tiltSpeed)
 }
 void MainWindow::moveRightOnce(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2539,7 +2534,7 @@ void MainWindow::moveRightOnce(int panSpeed, int tiltSpeed)
 }
 void MainWindow::moveHome()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2549,7 +2544,7 @@ void MainWindow::moveHome()
 }
 void MainWindow::zoomInOnce(int zoomSpeed)
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2560,7 +2555,7 @@ void MainWindow::zoomInOnce(int zoomSpeed)
 }
 void MainWindow::zoomOutOnce(int zoomSpeed)
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2571,7 +2566,7 @@ void MainWindow::zoomOutOnce(int zoomSpeed)
 }
 void MainWindow::stopMoving(int panSpeed, int tiltSpeed)
 {
-    uint8_t command[9];
+    char command[9];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x06;
@@ -2585,7 +2580,7 @@ void MainWindow::stopMoving(int panSpeed, int tiltSpeed)
 }
 void MainWindow::stopZooming()
 {
-    uint8_t command[6];
+    char command[6];
     command[0] = 0x81;
     command[1] = 0x01;
     command[2] = 0x04;
@@ -2694,7 +2689,7 @@ void MainWindow::loadCameraInfo()
 void MainWindow::getZoomInfo()
 {
     //    getStatusStep = 0;
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2704,7 +2699,7 @@ void MainWindow::getZoomInfo()
 }
 void MainWindow::getFocusInfo()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2714,7 +2709,7 @@ void MainWindow::getFocusInfo()
 }
 void MainWindow::getAFInfo()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2724,7 +2719,7 @@ void MainWindow::getAFInfo()
 }
 void MainWindow::getZoomFocusInfo()
 {
-    uint8_t command[6];
+    char command[6];
     //8x 09 7E 7E 00 FF
     command[0] = 0x81;
     command[1] = 0x09;
@@ -2738,7 +2733,7 @@ void MainWindow::getZoomFocusInfo()
 
 void MainWindow::getShutterInfo()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2748,7 +2743,7 @@ void MainWindow::getShutterInfo()
 }
 void MainWindow::getIrisInfo()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2758,7 +2753,7 @@ void MainWindow::getIrisInfo()
 }
 void MainWindow::getShutterIrisInfo()
 {
-    uint8_t command[6];
+    char command[6];
     //8x 09 7E 7E 01 FF
     command[0] = 0x81;
     command[1] = 0x09;
@@ -2772,7 +2767,7 @@ void MainWindow::getShutterIrisInfo()
 void MainWindow::getBrightInfo()
 {
     //8x 09 04 0D FF
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2782,7 +2777,7 @@ void MainWindow::getBrightInfo()
 }
 void MainWindow::getPanTiltInfo()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x06;
@@ -2793,7 +2788,7 @@ void MainWindow::getPanTiltInfo()
 void MainWindow::getLuminanceInfo()
 {
     //81 09 04 A1 FF
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2804,7 +2799,7 @@ void MainWindow::getLuminanceInfo()
 void MainWindow::getContrastInfo()
 {
     //81 09 04 A2 FF
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2815,7 +2810,7 @@ void MainWindow::getContrastInfo()
 void MainWindow::getHueInfo()
 {
     //81 09 04 4F FF
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2825,7 +2820,7 @@ void MainWindow::getHueInfo()
 }
 void MainWindow::getAeMode()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2835,7 +2830,7 @@ void MainWindow::getAeMode()
 }
 void MainWindow::getWBMode()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2845,7 +2840,7 @@ void MainWindow::getWBMode()
 }
 void MainWindow::getRGain()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2855,7 +2850,7 @@ void MainWindow::getRGain()
 }
 void MainWindow::getBGain()
 {
-    uint8_t command[5];
+    char command[5];
     command[0] = 0x81;
     command[1] = 0x09;
     command[2] = 0x04;
@@ -2868,7 +2863,7 @@ void MainWindow::resetCamera()
     if(isControllable)
     {
         //8x 01 04 00 03 FF off
-	uint8_t offCommand[6];
+        char offCommand[6];
         offCommand[0] = 0x81;
         offCommand[1] = 0x01;
         offCommand[2] = 0x04;
@@ -2877,7 +2872,7 @@ void MainWindow::resetCamera()
         offCommand[5] = 0xff;
         addToQue(offCommand , 6 , Command);
         //8x 01 04 00 02 FF on
-	uint8_t onCommand[6];
+        char onCommand[6];
         onCommand[0] = 0x81;
         onCommand[1] = 0x01;
         onCommand[2] = 0x04;
@@ -2888,13 +2883,13 @@ void MainWindow::resetCamera()
     }
 }
 /*camera query functions end*/
-void MainWindow::addToQue(uint8_t *command, int byteSize , COMMAND_TYPE type)
+void MainWindow::addToQue(char *command, int byteSize , COMMAND_TYPE type)
 {
     COMMAND *com = new COMMAND;
     com->comandLength = byteSize;
     for(int i = 0 ; i < byteSize ; i ++)
     {
-        com->commandByte[i] = (char) command[i];
+        com->commandByte[i] = command[i];
     }
 //    delete command;
     com->commandType = type;

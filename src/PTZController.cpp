@@ -8,8 +8,6 @@
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE(PLUGIN_NAME, "en-US")
 
-#define PLUGIN_VERSION "2.15"
-
 MainWindow *ptzMainWindow;
 
 bool obs_module_load(void)

@@ -12,9 +12,7 @@
 extern const char *PLUGIN_NAME;
 extern const char *PLUGIN_VERSION;
 
-#define obs_log  blog
-
-//void obs_log(int log_level, const char *format, ...);
+void obs_log(int log_level, const char *format, ...);
 extern void blogva(int log_level, const char *format, va_list args);
 
 obs_hotkey_id upHotkeyId, downHotkeyId, leftHotkeyId, rightHotkeyId, zoomInHotkeyId, zoomOutHotkeyId, presetCall1HotkeyId, presetCall2HotkeyId,

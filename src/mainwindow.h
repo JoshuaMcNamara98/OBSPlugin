@@ -240,7 +240,7 @@ public:
     void showMessage(QString str);
 private:
     //newly added
-    void addToQue(uint8_t* command , int byteSize , COMMAND_TYPE type);
+    void addToQue(char* command , int byteSize , COMMAND_TYPE type);
     void moveToNextCommand();
     void executeCommand(COMMAND* com);
 public slots:

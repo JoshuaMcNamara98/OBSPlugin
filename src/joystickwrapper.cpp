@@ -1,3 +1,7 @@
+#include <SDL_gamecontroller.h>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #include "joystickwrapper.h"
 #include <QDebug>
 #include <QStandardPaths>
@@ -8,7 +12,7 @@
 JoystickWrapper::JoystickWrapper(QObject *parent) : QObject(parent)
 {
     settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + DEFAULT_SETTINGS_PATH , QSettings::IniFormat);
-//    QJoysticks::getInstance()->setVirtualJoystickRange(0.8);
+    // QJoysticks::getInstance()->setVirtualJoystickRange(0.8);
     QJoysticks::getInstance()->setVirtualJoystickEnabled(false);
     connect(QJoysticks::getInstance() , SIGNAL(countChanged()) , this , SLOT(joystickCountChanged()));
     connect(QJoysticks::getInstance() , SIGNAL(povChanged(int,int,int)) , this , SLOT(joystickPOVChanged(int,int,int)));
@@ -33,7 +37,6 @@ void JoystickWrapper::joystickCountChanged()
     yPressed = false;
     aPressed = false;
 
-//    qDebug()<<QJoysticks::getInstance()->count();
 }
 void JoystickWrapper::joystickPOVChanged(const int js , const int pov , const int angle)
 {
@@ -83,114 +86,71 @@ void JoystickWrapper::joystickAxisChanged(const int js , const int axis , const 
 //    qDebug()<<(QJoysticks::getInstance()->getInputDevice(js)->axes);
 
 
-    if(axesNum < 4)
+    int axesNum = QJoysticks::getInstance()->getNumAxes(js);
+    if(axesNum < 2) // Need at least 2 axes for XY movement
         return;
-    //Remember the box axis map is different between xbox nad generic usb joystick
-    //after first moving there are some noise must remove
-    //use lastMove
 
-//    if(validEvent(js))
-//    {
+    // Use SDL2 symbolic axis names for clarity
+    if (axis == SDL_CONTROLLER_AXIS_LEFTX || axis == SDL_CONTROLLER_AXIS_LEFTY) {
+        double x = QJoysticks::getInstance()->getAxis(js, SDL_CONTROLLER_AXIS_LEFTX);
+        double y = QJoysticks::getInstance()->getAxis(js, SDL_CONTROLLER_AXIS_LEFTY);
 
-//        if(axis == SDL_CONTROLLER_AXIS_RIGHTX)//TR
-//        {
-//            if(value < STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVERIGHT)
-//                    emit moveRightBtnTriggered();
-//                lastMove = MOVERIGHT;
-//            }
-//            else if(value > -STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVELEFT)
-//                    emit moveLeftBtnTriggered();
-//                lastMove = MOVELEFT;
-//            }
-//            else
-//            {
-//                if(lastMove != STOPMOVING)
-//                    emit moveStop();
-//                lastMove = STOPMOVING;
-//            }
-//        }
+        // Deadzone filtering (circular)
+        double threshold = STICK_THRESHOULD;
+        double magnitude = std::sqrt(x * x + y * y);
+        if (magnitude < threshold) {
+            emit moveStop();
+            return;
+        }
 
-//        if(axis == SDL_CONTROLLER_AXIS_RIGHTY)//TR - generic us
-//        {
-//            if(value < STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVEDOWN)
-//                    emit moveBottomBtnTriggered();
-//                lastMove = MOVEDOWN;
-//            }
-//            else if(value > -STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVEUP)
-//                    emit moveTopBtnTriggered();
-//                lastMove = MOVEUP;
-//            }
-//            else
-//            {
-//                if(lastMove != STOPMOVING)
-//                    emit moveStop();
-//                lastMove = STOPMOVING;
-//            }
-//        }
+        // Calculate angle in degrees (atan2 uses y, x)
+        double angle = std::atan2(-y, x) * 180.0 / M_PI; // -y to match typical joystick convention (up is negative)
+        if (angle < 0) angle += 360.0;
 
-//        if(axis == SDL_CONTROLLER_AXIS_LEFTY)//TL
-//        {
-////            if(value > STICK_THRESHOULD)
-////                emit switchCamera(3);
-////            else if(value < - STICK_THRESHOULD)
-////                emit switchCamera(1);
-//            if(value < STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVEDOWN)
-//                    emit moveBottomBtnTriggered();
-//                lastMove = MOVEDOWN;
-//            }
-//            else if(value > -STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVEUP)
-//                    emit moveTopBtnTriggered();
-//                lastMove = MOVEUP;
-//            }
-//            else
-//            {
-//                if(lastMove != STOPMOVING)
-//                    emit moveStop();
-//                lastMove = STOPMOVING;
-//            }
+        // 8-way pie slice detection (each slice is 45 degrees)
+        if ((angle >= 337.5 && angle < 360.0) || (angle >= 0.0 && angle < 22.5)) {
+            emit moveRightBtnTriggered();
+        } else if (angle >= 22.5 && angle < 67.5) {
+            emit moveTopRightBtnTriggered();
+        } else if (angle >= 67.5 && angle < 112.5) {
+            emit moveTopBtnTriggered();
+        } else if (angle >= 112.5 && angle < 157.5) {
+            emit moveTopLeftBtnTriggered();
+        } else if (angle >= 157.5 && angle < 202.5) {
+            emit moveLeftBtnTriggered();
+        } else if (angle >= 202.5 && angle < 247.5) {
+            emit moveBottomLeftBtnTriggered();
+        } else if (angle >= 247.5 && angle < 292.5) {
+            emit moveBottomBtnTriggered();
+        } else if (angle >= 292.5 && angle < 337.5) {
+            emit moveBottomRightBtnTriggered();
+        }
+    }
 
-//        }
+    // Right stick Y axis for zoom control
+    if (axis == SDL_CONTROLLER_AXIS_RIGHTY) {
+        double threshold = STICK_THRESHOULD;
+        if (std::abs(value) < threshold) {
+            emit zoomStop();
+            return;
+        }
 
-//        if(axis == SDL_CONTROLLER_AXIS_LEFTX)//TL
-//        {
-////            if(value > STICK_THRESHOULD)
-////                emit switchCamera(2);
-////            else if(value < - STICK_THRESHOULD)
-////                emit switchCamera(4);
-//            if(value < STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVERIGHT)
-//                    emit moveRightBtnTriggered();
-//                lastMove = MOVERIGHT;
-//            }
-//            else if(value > -STICK_THRESHOULD)
-//            {
-//                if(lastMove != MOVELEFT)
-//                    emit moveLeftBtnTriggered();
-//                lastMove = MOVELEFT;
-//            }
-//            else
-//            {
-//                if(lastMove != STOPMOVING)
-//                    emit moveStop();
-//                lastMove = STOPMOVING;
-//            }
-//        }
+        // Scale the joystick value to the zoom speed (value in [-1, 1])
+        int scaledSpeed = std::round(std::abs(value) * zoomSpeed);
+        if (scaledSpeed == 0) scaledSpeed = 1; // Ensure minimum speed if outside threshold
 
-//    }
+        if (value < 0) {
+            // Zoom in
+            emit zoomInBtnTriggered();
+        } else {
+            // Zoom out
+            emit zoomOutBtnTriggered();
+        }
+        // Note: If you want to pass the speed, update the signal/slot to accept a parameter
+        return;
+    }
 }
+
 void JoystickWrapper::joystickButtonChanged(const int js , const int button , const bool pressed)
 {
     qDebug()<<button;
@@ -229,6 +189,7 @@ void JoystickWrapper::joystickButtonChanged(const int js , const int button , co
         case BTN_TR:
             if(!pressed)
                 emit moveHome();
+            break;
         case BTN_LB:
             if(pressed)
                 emit zoomInBtnTriggered();

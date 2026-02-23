@@ -1,9 +1,7 @@
 #ifndef HOTKEYHELP_H
 #define HOTKEYHELP_H
 
-#pragma once
-
-#include <QtWidgets/QDialog>
+#include <QDialog>
 
 namespace Ui {
 class HotkeyHelp;

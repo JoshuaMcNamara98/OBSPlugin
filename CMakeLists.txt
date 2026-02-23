@@ -1,18 +1,36 @@
 cmake_minimum_required(VERSION 3.16...3.26)
 
-legacy_check()
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCOPE)
+
+project(${_name} VERSION ${_version})
 
 option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" ON)
 option(ENABLE_QT "Use Qt functionality" ON)
 
 include(compilerconfig)
 include(defaults)
-include(helpers)	
+include(helpers)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+find_package(libobs REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
+
+if(ENABLE_FRONTEND_API)
+  find_package(obs-frontend-api REQUIRED)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api)
+endif()
+
+if(ENABLE_QT)
+  find_package(Qt6 COMPONENTS Widgets Core)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
+  target_compile_options(
+    ${CMAKE_PROJECT_NAME} PRIVATE $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-quoted-include-in-framework-header
+                                  -Wno-comma>)
+  set_target_properties(
+    ${CMAKE_PROJECT_NAME}
+    PROPERTIES AUTOMOC ON
+               AUTOUIC ON
+               AUTORCC ON)
+endif()
 
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -27,68 +45,50 @@ find_package(Qt6Core REQUIRED)
 find_package(Qt6Network REQUIRED)	
 find_package(Qt6Widgets REQUIRED)
 
-
-target_enable_feature(mac-syphon "Syphon sharing support")
-
-add_library(obs-ptzcontroller MODULE)
-add_library(OBS::obs-ptzcontroller ALIAS obs-ptzcontroller)
-
-target_sources(obs-ptzcontroller PRIVATE 
-    src/helpwin.cpp
-    src/hotkeyhelp.cpp
-    src/xboxhelp.cpp
-    src/pantiltlimitdlg.cpp
-	src/PTZController.cpp
-	src/mainwindow.cpp
-	src/multicameras.cpp
-	src/aboutus.cpp
-	src/joystickdlg.cpp
-	src/joystickwrapper.cpp
-	src/QJoysticks.cpp
-	src/SDL_Joysticks.cpp
-	src/VirtualJoystick.cpp
-	src/ptzqrc.qrc	
-    src/helpwin.h
-    src/hotkeyhelp.h
-    src/xboxhelp.h
-    src/pantiltlimitdlg.h
-	src/PTZController.h
-	src/mainwindow.h
-	src/multicameras.h
-	src/aboutus.h
-	src/constants.h
-	src/joystickdlg.h
-	src/joystickwrapper.h
-	src/JoysticksCommon.h
-	src/QJoysticks.h
-	src/SDL_Joysticks.h
-	src/VirtualJoystick.h
+set(ptzcontroller_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hotkeyhelp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/xboxhelp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/pantiltlimitdlg.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/PTZController.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/multicameras.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/aboutus.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/joystickdlg.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/joystickwrapper.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/QJoysticks.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/SDL_Joysticks.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/VirtualJoystick.cpp
 	)
 
-target_link_libraries(obs-ptzcontroller PRIVATE OBS::libobs)
+set(ptzcontroller_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hotkeyhelp.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/xboxhelp.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/pantiltlimitdlg.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/PTZController.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/multicameras.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/aboutus.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/constants.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/joystickdlg.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/joystickwrapper.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/JoysticksCommon.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/QJoysticks.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/SDL_Joysticks.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/VirtualJoystick.h
+	)
 
-if(ENABLE_FRONTEND_API)
-endif()
+add_library(${CMAKE_PROJECT_NAME} MODULE
+	${ptzcontroller_SOURCES}
+	${ptzcontroller_HEADERS}
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ptzqrc.qrc
+	)
 
-if(ENABLE_QT)
-  find_package(Qt6 COMPONENTS Widgets Core)
-  target_link_libraries(obs-ptzcontroller PRIVATE Qt6::Core Qt6::Widgets)
-  target_compile_options(
-     obs-ptzcontroller PRIVATE $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-quoted-include-in-framework-header
-                                  -Wno-comma>)
-  set_target_properties(
-     obs-ptzcontroller
-    PROPERTIES AUTOMOC ON
-               AUTOUIC ON
-               AUTORCC ON)
-endif()
-	
-
-	
 if (WIN32)
-    target_compile_options(obs-ptzcontroller PUBLIC "/WX-")
+    target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC "/WX-")
 else()
-    target_compile_options(obs-ptzcontroller PUBLIC "-w")
+    target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC "-w")
 endif()
 
 find_package(SDL2 REQUIRED)
@@ -101,8 +101,8 @@ include_directories(
 	${Qt6Network_INCLUDES}
 	${Qt6Widgets_INCLUDES}
 	)
-
-target_link_libraries(obs-ptzcontroller
+		
+target_link_libraries(${CMAKE_PROJECT_NAME}
 	PRIVATE OBS::frontend-api
 	PRIVATE OBS::libobs
 	${SDL2_LIBRARIES}
@@ -111,4 +111,5 @@ target_link_libraries(obs-ptzcontroller
 	Qt6::Widgets
 	)
 
-set_target_properties_obs(obs-ptzcontroller PROPERTIES FOLDER plugins/ptzoptics-obs PREFIX "")
+setup_plugin_target(${CMAKE_PROJECT_NAME})
+

@@ -1,5 +1,3 @@
-#if 0
-
 #include "xboxhelp.h"
 #include "ui_xboxhelp.h"
 
@@ -14,5 +12,3 @@ XBoxHelp::~XBoxHelp()
 {
     delete ui;
 }
-
-#endif //0

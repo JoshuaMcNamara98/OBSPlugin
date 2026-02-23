@@ -1,5 +1,3 @@
-#if 0
-
 #ifndef XBOXHELP_H
 #define XBOXHELP_H
 
@@ -22,5 +20,3 @@ private:
 };
 
 #endif // XBOXHELP_H
-
-#endif //0
