@@ -1239,6 +1239,7 @@ void MainWindow::onFocusSpeedChanged(int index)
 void MainWindow::onZoomSpeedChanged(int index)
 {
     setSettings(currentCamIp , SETTING_KEY_ZOOMSPEED , index);
+    joystick->setZoomSpeed(index);
 }
 void MainWindow::onPanSpeedChanged(int index)
 {

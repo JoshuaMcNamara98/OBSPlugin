@@ -34,18 +34,18 @@ public:
     explicit JoystickWrapper(QObject *parent = nullptr);
     ~JoystickWrapper();
     QStringList getJoystickNames();
+    void setZoomSpeed(int speed) { zoomSpeed = speed; }
 private:
     AXISMOVE lastMove = STOPMOVING;
     int currentJoystickId;
     bool isJoystickEnabled;
     QSettings *settings;
     bool validEvent(int js);
-
+    int zoomSpeed = 5; // Default zoom speed, set by UI
     bool xPressed, yPressed, aPressed;//for control leminance and contrast and hue
 
 public slots:
     void joystickCountChanged();
-
     void joystickPOVChanged(const int js , const int pov , const int angle);
     void joystickAxisChanged(const int js , const int axis , const double value);
     void joystickButtonChanged(const int js , const int button , const bool pressed);
@@ -76,7 +76,6 @@ signals:
     void hueChangeTriggered(bool increase);
     void callPreset(int presetNum);
     void switchCamera(int cameraNum);
-
 };
 
 #endif // JOYSTICKWRAPPER_H
