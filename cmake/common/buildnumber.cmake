@@ -1,4 +1,3 @@
-
 # CMake build number module
 
 include_guard(GLOBAL)

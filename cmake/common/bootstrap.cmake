@@ -1,4 +1,3 @@
-
 # Plugin bootstrap module
 
 include_guard(GLOBAL)
@@ -31,24 +30,6 @@ set(
 )
 # gersemi: on
 
-# Retain custom CMake policy settings and IDE folder organization
-if(POLICY CMP0011)
-  cmake_policy(SET CMP0011 NEW)
-endif()
-if(POLICY CMP0025)
-  cmake_policy(SET CMP0025 NEW)
-endif()
-if(POLICY CMP0055)
-  cmake_policy(SET CMP0055 NEW)
-endif()
-if(POLICY CMP0063)
-  cmake_policy(SET CMP0063 NEW)
-endif()
-if(POLICY CMP0090)
-  cmake_policy(SET CMP0090 NEW)
-endif()
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
 # Prohibit in-source builds
 if("${CMAKE_CURRENT_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
   message(
@@ -77,15 +58,30 @@ set(PLUGIN_EMAIL ${_email})
 set(PLUGIN_VERSION ${_version})
 set(MACOS_BUNDLEID ${_bundleId})
 
+string(REPLACE "." ";" _version_canonical "${_version}")
+list(GET _version_canonical 0 PLUGIN_VERSION_MAJOR)
+list(GET _version_canonical 1 PLUGIN_VERSION_MINOR)
+list(GET _version_canonical 2 PLUGIN_VERSION_PATCH)
+unset(_version_canonical)
+
 include(buildnumber)
 include(osconfig)
 
 # Allow selection of common build types via UI
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
+if(NOT CMAKE_GENERATOR MATCHES "(Xcode|Visual Studio .+)")
+  if(NOT CMAKE_BUILD_TYPE)
+    set(
+      CMAKE_BUILD_TYPE
       "RelWithDebInfo"
-      CACHE STRING "OBS build type [Release, RelWithDebInfo, Debug, MinSizeRel]" FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Release RelWithDebInfo Debug MinSizeRel)
+      CACHE STRING
+      "OBS build type [Release, RelWithDebInfo, Debug, MinSizeRel]"
+      FORCE
+    )
+    set_property(
+      CACHE CMAKE_BUILD_TYPE
+      PROPERTY STRINGS Release RelWithDebInfo Debug MinSizeRel
+    )
+  endif()
 endif()
 
 # Disable exports automatically going into the CMake package registry

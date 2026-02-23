@@ -1,4 +1,3 @@
-
 # CMake common helper functions module
 
 include_guard(GLOBAL)

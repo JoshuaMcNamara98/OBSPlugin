@@ -1,4 +1,4 @@
-## CMake common compiler options module
+# CMake common compiler options module
 
 include_guard(GLOBAL)
 
@@ -12,7 +12,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
-
 
 # clang options for C, C++, ObjC, and ObjC++
 set(
@@ -58,24 +57,26 @@ set(
   -Wno-error=shorten-64-to-32
 )
 
+# clang options for C
+set(_obs_clang_c_options ${_obs_clang_common_options} -Wno-shadow -Wno-float-conversion)
+
 # clang options for C++
-set(_obs_clang_cxx_options
-    # cmake-format: sortable
-    ${_obs_clang_c_options}
-    -Wconversion
-    -Wdeprecated-implementations
-    -Wduplicate-method-match
-    -Wfloat-conversion
-    -Wfour-char-constants
-    -Wimplicit-retain-self
-    -Winvalid-offsetof
-    -Wmove
-    -Wno-c++11-extensions
-    -Wno-exit-time-destructors
-    -Wno-implicit-atomic-properties
-    -Wno-objc-interface-ivars
-    -Wno-overloaded-virtual
-    -Wrange-loop-analysis)
+set(
+  _obs_clang_cxx_options
+  ${_obs_clang_common_options}
+  -Wno-non-virtual-dtor
+  -Wno-overloaded-virtual
+  -Wno-exit-time-destructors
+  -Wno-shadow
+  -Winvalid-offsetof
+  -Wmove
+  -Werror=block-capture-autoreleasing
+  -Wrange-loop-analysis
+)
+
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 20)
+  list(APPEND _obs_clang_cxx_options -fno-char8_t)
+endif()
 
 if(NOT DEFINED CMAKE_COMPILE_WARNING_AS_ERROR)
   set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
