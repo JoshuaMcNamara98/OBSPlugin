@@ -104,26 +104,13 @@ jobs:
         with:
           version: '6.6.0'
           arch: win64_msvc2019_64
-
-      - name: Debug Qt & CMake Environment
+      
+      - name: Set Qt CMAKE_PREFIX_PATH
         shell: pwsh
         run: |
-          Write-Host "=== Qt Environment ==="
+          # Set CMAKE_PREFIX_PATH to point to Qt's cmake directory
+          $Env:CMAKE_PREFIX_PATH = "D:\a\OBSPlugin\Qt\6.6.0\msvc2019_64\lib\cmake"
           Write-Host "CMAKE_PREFIX_PATH = $Env:CMAKE_PREFIX_PATH"
-          Write-Host "PATH = $Env:PATH"
-          Get-ChildItem $Env:CMAKE_PREFIX_PATH
-          Write-Host "=== CMake Version ==="
-          cmake --version
-
-      - name: CMake Debug Find Qt
-        shell: pwsh
-        run: |
-          cmake -S . -B build_debug -G "Visual Studio 16 2019" -A x64 -DENABLE_QT=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -LAH
-
-      - name: Test Qt6 Detection
-        shell: pwsh
-        run: |
-          cmake -S . -B build_test -G "Visual Studio 16 2019" -A x64 -DENABLE_QT=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
       - name: Build Plugin 🧱
         uses: ./.github/actions/build-plugin
