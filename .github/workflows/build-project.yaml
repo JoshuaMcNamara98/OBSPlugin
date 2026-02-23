@@ -85,7 +85,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Qt6
-        uses: miurahr/setup-qt@v3
+        uses: qt/qt-setup-action@v3
         with:
           version: '6.6.0'
           host: 'windows'
