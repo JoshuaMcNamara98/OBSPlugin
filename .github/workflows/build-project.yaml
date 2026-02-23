@@ -103,7 +103,12 @@ jobs:
           $scriptPath = "$env:RUNNER_TEMP\qt-installer-script.txt"
           $script | Set-Content -Path $scriptPath
           Start-Process -FilePath $qtInstallerPath -ArgumentList "--script", $scriptPath, "--silent" -Wait
-          $qtDir = Get-ChildItem -Path $qtInstallDir -Directory | Select-Object -First 1 | ForEach-Object { $_.FullName }
+          $qtConfig = Get-ChildItem -Path $qtInstallDir -Recurse -Filter Qt6CoreConfig.cmake | Select-Object -First 1
+          if ($null -eq $qtConfig) {
+            Write-Error 'Could not find Qt6CoreConfig.cmake after installation.'
+            exit 1
+          }
+          $qtDir = $qtConfig.Directory.Parent.Parent.Parent.FullName
           echo "QT6DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "CMAKE_PREFIX_PATH=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "QTDIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
