@@ -24,7 +24,7 @@ endif()
 
 if(ENABLE_QT)
   find_package(Qt6 COMPONENTS Widgets Core)
-  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Network)
   target_compile_options(
     ${CMAKE_PROJECT_NAME}
     PRIVATE $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-quoted-include-in-framework-header -Wno-comma>
@@ -42,11 +42,6 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL Darwin)
 else()
 	set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src/ui_windows")
 endif()
-
-
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Network REQUIRED)	
-find_package(Qt6Widgets REQUIRED)
 
 set(ptzcontroller_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.cpp
@@ -97,20 +92,10 @@ endif()
 
 find_package(SDL2 REQUIRED)
 include_directories(
-	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
-	${LIBOBS_INCLUDE_DIR}
 	${SDL2_INCLUDE_DIRS}
-	${Qt6Core_INCLUDES}
-	${Qt6Network_INCLUDES}
-	${Qt6Widgets_INCLUDES}
 )
 target_link_libraries(${CMAKE_PROJECT_NAME}
-	PRIVATE OBS::frontend-api
-	PRIVATE OBS::libobs
 	${SDL2_LIBRARIES}
-	Qt6::Core
-	Qt6::Network
-	Qt6::Widgets
 )
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
