@@ -13,6 +13,7 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
+
 # clang options for C, C++, ObjC, and ObjC++
 set(
   _obs_clang_common_options
@@ -56,12 +57,6 @@ set(
   -Wvla
   -Wno-error=shorten-64-to-32
 )
-
-# clang options for C
-    -Wunused-parameter
-    -Wunused-value
-    -Wunused-variable
-    -Wvla)
 
 # clang options for C++
 set(_obs_clang_cxx_options
