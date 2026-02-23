@@ -90,13 +90,5 @@ else()
 	target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC "-w")
 endif()
 
-find_package(SDL2 REQUIRED)
-include_directories(
-	${SDL2_INCLUDE_DIRS}
-)
-target_link_libraries(${CMAKE_PROJECT_NAME}
-	${SDL2_LIBRARIES}
-)
-
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
 
