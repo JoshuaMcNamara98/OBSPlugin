@@ -31,6 +31,10 @@ runs:
         brew install --quiet zsh
         echo ::endgroup::
 
+    - name: Make run-cmake-format executable
+      shell: bash
+      run: chmod +x ./build-aux/run-cmake-format
+
     - name: Run cmake-format 🎛️
       id: result
       shell: zsh --no-rcs --errexit --pipefail {0}
