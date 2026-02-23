@@ -84,13 +84,17 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install Qt6
-        uses: qt/qt-setup-action@v3
-        with:
-          version: '6.6.0'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
+      - name: Download and Extract Qt6
+        shell: pwsh
+        run: |
+          $qtUrl = "https://download.qt.io/official_releases/qt/6.6/6.6.0/qt6_6.6.0-windows-x64-msvc2019_64.7z"
+          $qtArchive = "$env:RUNNER_TEMP\qt6.7z"
+          $qtDir = "$env:RUNNER_TEMP\Qt6"
+          Invoke-WebRequest -Uri $qtUrl -OutFile $qtArchive
+          7z x $qtArchive -o$qtDir | Out-Null
+          echo "QT6DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "CMAKE_PREFIX_PATH=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "QTDIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Set Up Environment 🔧
         id: setup
