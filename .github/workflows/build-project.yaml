@@ -84,6 +84,13 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Install vcpkg
+        uses: lukka/run-vcpkg@v11
+
+      - name: Install SDL2
+        run: |
+          vcpkg install sdl2:x64-windows
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
