@@ -113,7 +113,7 @@ jobs:
           pip install aqtinstall
 
           # List all available Qt versions for Windows desktop
-          python -m aqt list-qt windows desktop 6.6.0
+          python -m aqt list-qt windows desktop
       
       - name: Set Qt CMAKE_PREFIX_PATH
         shell: pwsh
