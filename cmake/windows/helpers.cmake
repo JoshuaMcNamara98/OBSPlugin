@@ -1,8 +1,4 @@
-# CMake Windows helper functions module
-
-# cmake-format: off
-# cmake-lint: disable=C0103
-# cmake-format: on
+## CMake Windows helper functions module
 
 include_guard(GLOBAL)
 
@@ -26,38 +22,41 @@ function(set_target_properties_plugin target)
 
   set_target_properties(${target} PROPERTIES VERSION 0 SOVERSION ${PLUGIN_VERSION})
 
-  install(
-    TARGETS ${target}
-    RUNTIME DESTINATION bin/64bit
-    LIBRARY DESTINATION obs-plugins/64bit)
+  install(TARGETS ${target} RUNTIME DESTINATION "${target}/bin/64bit" LIBRARY DESTINATION "${target}/bin/64bit")
 
   install(
     FILES "$<TARGET_PDB_FILE:${target}>"
     CONFIGURATIONS RelWithDebInfo Debug Release
-    DESTINATION obs-plugins/64bit
-    OPTIONAL)
-
-  if(OBS_BUILD_DIR)
-    add_custom_command(
-      TARGET ${target}
-      POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E make_directory "${OBS_BUILD_DIR}/obs-plugins/64bit"
-      COMMAND
-        "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${target}>"
-        "$<$<CONFIG:Debug,RelWithDebInfo,Release>:$<TARGET_PDB_FILE:${target}>>" "${OBS_BUILD_DIR}/obs-plugins/64bit"
-      COMMENT "Copy ${target} to obs-studio directory ${OBS_BUILD_DIR}"
-      VERBATIM)
-  endif()
+    DESTINATION "${target}/bin/64bit"
+    OPTIONAL
+  )
 
   if(TARGET plugin-support)
     target_link_libraries(${target} PRIVATE plugin-support)
   endif()
+
+  add_custom_command(
+    TARGET ${target}
+    POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/rundir/$<CONFIG>"
+    COMMAND
+      "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${target}>"
+      "$<$<CONFIG:Debug,RelWithDebInfo,Release>:$<TARGET_PDB_FILE:${target}>>"
+      "${CMAKE_CURRENT_BINARY_DIR}/rundir/$<CONFIG>"
+    COMMENT "Copy ${target} to rundir"
+    VERBATIM
+  )
 
   target_install_resources(${target})
 
   get_target_property(target_sources ${target} SOURCES)
   set(target_ui_files ${target_sources})
   list(FILTER target_ui_files INCLUDE REGEX ".+\\.(ui|qrc)")
+  source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "UI Files" FILES ${target_ui_files})
+
+  configure_file(cmake/windows/resources/resource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.rc")
+  target_sources(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.rc")
+endfunction()
   source_group(
     TREE "${CMAKE_CURRENT_SOURCE_DIR}"
     PREFIX "UI Files"

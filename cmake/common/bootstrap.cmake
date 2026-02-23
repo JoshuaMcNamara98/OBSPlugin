@@ -1,56 +1,75 @@
-cmake_minimum_required(VERSION 3.16...3.26)
+
+# Plugin bootstrap module
 
 include_guard(GLOBAL)
 
-# Enable automatic PUSH and POP of policies to parent scope
+# Map fallback configurations for optimized build configurations
+# gersemi: off
+set(
+  CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO
+    RelWithDebInfo
+    Release
+    MinSizeRel
+    None
+    ""
+)
+set(
+  CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL
+    MinSizeRel
+    Release
+    RelWithDebInfo
+    None
+    ""
+)
+set(
+  CMAKE_MAP_IMPORTED_CONFIG_RELEASE
+    Release
+    RelWithDebInfo
+    MinSizeRel
+    None
+    ""
+)
+# gersemi: on
+
+# Retain custom CMake policy settings and IDE folder organization
 if(POLICY CMP0011)
   cmake_policy(SET CMP0011 NEW)
 endif()
-
-# Enable distinction between Clang and AppleClang
 if(POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif()
-
-# Enable strict checking of "break()" usage
 if(POLICY CMP0055)
   cmake_policy(SET CMP0055 NEW)
 endif()
-
-# Honor visibility presets for all target types (executable, shared, module, static)
 if(POLICY CMP0063)
   cmake_policy(SET CMP0063 NEW)
 endif()
-
-# Disable export function calls to populate package registry by default
 if(POLICY CMP0090)
   cmake_policy(SET CMP0090 NEW)
 endif()
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Prohibit in-source builds
 if("${CMAKE_CURRENT_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
-  message(FATAL_ERROR "In-source builds are not supported. "
-                      "Specify a build directory via 'cmake -S <SOURCE DIRECTORY> -B <BUILD_DIRECTORY>' instead.")
+  message(
+    FATAL_ERROR
+    "In-source builds are not supported. "
+    "Specify a build directory via 'cmake -S <SOURCE DIRECTORY> -B <BUILD_DIRECTORY>' instead."
+  )
   file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/CMakeCache.txt" "${CMAKE_CURRENT_SOURCE_DIR}/CMakeFiles")
 endif()
-
-# Use folders for source file organization with IDE generators (Visual Studio/Xcode)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Add common module directories to default search path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/common")
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/buildspec.json" buildspec)
 
-# cmake-format: off
 string(JSON _name GET ${buildspec} name)
 string(JSON _website GET ${buildspec} website)
 string(JSON _author GET ${buildspec} author)
 string(JSON _email GET ${buildspec} email)
 string(JSON _version GET ${buildspec} version)
 string(JSON _bundleId GET ${buildspec} platformConfig macos bundleId)
-string(JSON _windowsAppUUID GET ${buildspec} uuids windowsApp)
-# cmake-format: on
 
 set(PLUGIN_AUTHOR ${_author})
 set(PLUGIN_WEBSITE ${_website})

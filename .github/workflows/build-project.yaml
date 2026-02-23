@@ -3,12 +3,12 @@ on:
   workflow_call:
     outputs:
       pluginName:
-        description: 'Project name detected by parsing build spec file'
+        description: Project name detected by parsing build spec file
         value: ${{ jobs.check-event.outputs.pluginName }}
 jobs:
   check-event:
     name: Check GitHub Event Data 🔎
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
@@ -83,24 +83,6 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-
-      - name: Install SDL2 (Chocolatey)
-        shell: pwsh
-        run: |
-          choco install -y sdl2
-          $sdl2Root = (Get-ChildItem -Path "C:/ProgramData/chocolatey/lib/SDL2" -Directory | Select-Object -First 1).FullName
-          $sdl2Cmake = Join-Path $sdl2Root 'build/cmake'
-          if (Test-Path $sdl2Cmake) {
-            echo "CMAKE_PREFIX_PATH=$sdl2Cmake;$env:CMAKE_PREFIX_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
-          }
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.6.3'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
 
       - name: Set Up Environment 🔧
         id: setup
