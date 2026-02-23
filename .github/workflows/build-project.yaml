@@ -103,7 +103,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           version: '6.6.0'
-          arch: win64_msvc2022_64
+          arch: win64_msvc2020_64
 
       - name: Debug Qt & CMake Environment
         shell: pwsh
@@ -119,7 +119,7 @@ jobs:
         shell: pwsh
         run: |
           # Set CMAKE_PREFIX_PATH to point to Qt's cmake directory
-          $Env:CMAKE_PREFIX_PATH = "D:\a\OBSPlugin\Qt\6.6.0\msvc2022_64\lib\cmake"
+          $Env:CMAKE_PREFIX_PATH = "D:\a\OBSPlugin\Qt\6.6.0\msvc2020_64\lib\cmake"
           Write-Host "CMAKE_PREFIX_PATH = $Env:CMAKE_PREFIX_PATH"
 
       - name: Build Plugin 🧱
