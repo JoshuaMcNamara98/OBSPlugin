@@ -87,7 +87,7 @@ jobs:
       - name: Install Qt6 with Qt Online Installer
         shell: pwsh
         run: |
-          $qtInstallerUrl = "https://download.qt.io/official_releases/online_installers/qt-unified-windows-x64-online.exe"
+          $qtInstallerUrl = "https://download.qt.io/official_releases/online_installers/qt-online-installer-windows-x64-online.exe"
           $qtInstallerPath = "$env:RUNNER_TEMP\qt-installer.exe"
           $qtInstallDir = "$env:RUNNER_TEMP\Qt6"
           Invoke-WebRequest -Uri $qtInstallerUrl -OutFile $qtInstallerPath
