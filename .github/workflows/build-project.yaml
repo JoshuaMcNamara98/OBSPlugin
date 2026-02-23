@@ -84,34 +84,14 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install Qt6 with Qt Online Installer
-        shell: pwsh
-        run: |
-          $qtInstallerUrl = "https://download.qt.io/official_releases/online_installers/qt-online-installer-windows-x64-online.exe"
-          $qtInstallerPath = "$env:RUNNER_TEMP\qt-installer.exe"
-          $qtInstallDir = "$env:RUNNER_TEMP\Qt6"
-          Invoke-WebRequest -Uri $qtInstallerUrl -OutFile $qtInstallerPath
-          # Create a Qt installer script
-          $script = @"
-          --root "$qtInstallDir"
-          --accept-licenses
-          --confirm-command
-          --verbose
-          --platform minimal
-          --modules qt.qt6.660.win64_msvc2019_64,qt.qt6.660.win64_msvc2019_64.qtbase,qt.qt6.660.win64_msvc2019_64.qttools,qt.qt6.660.win64_msvc2019_64.qtnetworkauth,qt.qt6.660.win64_msvc2019_64.qtsvg,qt.qt6.660.win64_msvc2019_64.qtdeclarative
-          "@
-          $scriptPath = "$env:RUNNER_TEMP\qt-installer-script.txt"
-          $script | Set-Content -Path $scriptPath
-          Start-Process -FilePath $qtInstallerPath -ArgumentList "--script", $scriptPath, "--silent" -Wait
-          $qtConfig = Get-ChildItem -Path $qtInstallDir -Recurse -Filter Qt6CoreConfig.cmake | Select-Object -First 1
-          if ($null -eq $qtConfig) {
-            Write-Error 'Could not find Qt6CoreConfig.cmake after installation.'
-            exit 1
-          }
-          $qtDir = $qtConfig.Directory.Parent.Parent.Parent.FullName
-          echo "QT6DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "CMAKE_PREFIX_PATH=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "QTDIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.6.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          modules: 'qttools qtsvg qtdeclarative qtnetworkauth'
 
       - name: Set Up Environment 🔧
         id: setup
