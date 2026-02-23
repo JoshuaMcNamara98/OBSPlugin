@@ -104,6 +104,16 @@ jobs:
         with:
           version: '6.6.0'
           arch: win64_msvc2022_64
+
+      - name: Debug Qt & CMake Environment
+        shell: pwsh
+        run: |
+          Write-Host "=== Qt Environment ==="
+          Write-Host "CMAKE_PREFIX_PATH = $Env:CMAKE_PREFIX_PATH"
+          Write-Host "PATH = $Env:PATH"
+          Get-ChildItem $Env:CMAKE_PREFIX_PATH
+          Write-Host "=== CMake Version ==="
+          cmake --version
       
       - name: Set Qt CMAKE_PREFIX_PATH
         shell: pwsh
