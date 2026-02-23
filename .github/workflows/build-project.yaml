@@ -84,14 +84,15 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Clone vcpkg
-        run: git clone https://github.com/microsoft/vcpkg.git
-
-      - name: Bootstrap vcpkg
-        run: .\vcpkg\bootstrap-vcpkg.bat
-
-      - name: Install SDL2
-        run: .\vcpkg\vcpkg install sdl2:x64-windows
+      - name: Install SDL2 (Chocolatey)
+        shell: pwsh
+        run: |
+          choco install -y sdl2
+          $sdl2Root = (Get-ChildItem -Path "C:/ProgramData/chocolatey/lib/SDL2" -Directory | Select-Object -First 1).FullName
+          $sdl2Cmake = Join-Path $sdl2Root 'build/cmake'
+          if (Test-Path $sdl2Cmake) {
+            echo "CMAKE_PREFIX_PATH=$sdl2Cmake;$env:CMAKE_PREFIX_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
+          }
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
