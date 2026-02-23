@@ -1,1 +1,3 @@
-.run-format.zsh
+#!/usr/bin/env zsh
+SCRIPT_DIR="${0:A:h}"
+source "$SCRIPT_DIR/.run-format.zsh" "$@"

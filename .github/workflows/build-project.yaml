@@ -84,6 +84,14 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Install Qt6
+        uses: miurahr/setup-qt@v3
+        with:
+          version: '6.6.0'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+
       - name: Set Up Environment 🔧
         id: setup
         run: |
