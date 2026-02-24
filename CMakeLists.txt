@@ -7,7 +7,6 @@ project(${_name} VERSION ${_version})
 option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" ON)
 option(ENABLE_QT "Use Qt functionality" ON)
 
-
 include(compilerconfig)
 include(defaults)
 include(helpers)
@@ -23,7 +22,7 @@ if(ENABLE_FRONTEND_API)
 endif()
 
 if(ENABLE_QT)
-  find_package(Qt6 REQUIRED COMPONENTS Widgets Core Network)
+  find_package(Qt6 COMPONENTS Widgets Core Network)
   target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Network)
   target_compile_options(
     ${CMAKE_PROJECT_NAME}
@@ -35,18 +34,25 @@ if(ENABLE_QT)
   )
 endif()
 
+# Add locally installed SDL2 libraries
+set(SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/SDL2-2.28.2/cmake")
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SDL2_DIR}/../include)
+find_package(SDL2 REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL2::SDL2)
+
+# Include UI directories for autouic
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if (${CMAKE_SYSTEM_NAME} STREQUAL Darwin)
 	set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src/ui_macos")
 else()
-	set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src/ui_windows")
+	set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src/ui_windows")
 endif()
 
 set(ptzcontroller_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/hotkeyhelp.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/xboxhelp.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/pantiltlimitdlg.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/hotkeyhelp.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/xboxhelp.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/pantiltlimitdlg.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PTZController.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/multicameras.cpp
@@ -56,13 +62,13 @@ set(ptzcontroller_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/QJoysticks.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/SDL_Joysticks.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/VirtualJoystick.cpp
-	)
+)
 
 set(ptzcontroller_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/hotkeyhelp.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/xboxhelp.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/pantiltlimitdlg.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/helpwin.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/hotkeyhelp.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/xboxhelp.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/pantiltlimitdlg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PTZController.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/multicameras.h
@@ -74,7 +80,7 @@ set(ptzcontroller_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/QJoysticks.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/SDL_Joysticks.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/VirtualJoystick.h
-	)
+)
 
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -82,6 +88,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 	${ptzcontroller_HEADERS}
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ptzqrc.qrc
 )
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if (WIN32)
 	target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC "/WX-")
@@ -90,4 +97,3 @@ else()
 endif()
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
-

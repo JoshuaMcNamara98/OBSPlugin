@@ -86,10 +86,6 @@ void JoystickWrapper::joystickAxisChanged(const int js , const int axis , const 
 {
     qDebug()<<axis;
     qDebug()<<value;
-    int axesNum = QJoysticks::getInstance()->getNumAxes(js);
-//    qDebug()<<"Number of axes"<<axesNum;
-//    qDebug()<<(QJoysticks::getInstance()->getInputDevice(js)->axes);
-
 
     int axesNum = QJoysticks::getInstance()->getNumAxes(js);
     if(axesNum < 2) // Need at least 2 axes for XY movement

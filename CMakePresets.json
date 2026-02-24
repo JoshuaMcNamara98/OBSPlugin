@@ -10,8 +10,8 @@
       "name": "template",
       "hidden": true,
       "cacheVariables": {
-        "ENABLE_FRONTEND_API": false,
-        "ENABLE_QT": false
+        "ENABLE_FRONTEND_API": true,
+        "ENABLE_QT": true
       }
     },
     {
@@ -56,22 +56,18 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       },
-      "generator": "Visual Studio 17 2022",
-      "architecture": "x64,version=10.0.22621",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64,version=10.0.22621.0",
       "warnings": {"dev": true, "deprecated": true}
-        ,"cacheVariables": {
-          "CMAKE_PREFIX_PATH": "D:/a/OBSPlugin/Qt/6.6.0/msvc2019_64/lib/cmake"
-        }
     },
     {
       "name": "windows-ci-x64",
       "inherits": ["windows-x64"],
       "displayName": "Windows x64 CI build",
       "description": "Build for Windows x64 on CI",
-        "cacheVariables": {
-          "CMAKE_COMPILE_WARNING_AS_ERROR": true,
-          "CMAKE_PREFIX_PATH": "D:/a/OBSPlugin/Qt/6.6.0/msvc2019_64/lib/cmake"
-        }
+      "cacheVariables": {
+        "CMAKE_COMPILE_WARNING_AS_ERROR": true
+      }
     },
     {
       "name": "ubuntu-x86_64",

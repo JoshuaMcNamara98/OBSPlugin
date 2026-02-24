@@ -31,9 +31,6 @@ bool obs_module_load(void)
 
 	obs_frontend_add_preload_callback(registerPTZHotkeys, NULL);
 	obs_frontend_add_save_callback(savePTZHotkeys, NULL);
-
-	obs_log(LOG_INFO, "plugin loaded successfully (version %s)",
-	PLUGIN_VERSION);
 	
 	return true;
 }
@@ -206,9 +203,3 @@ void ptzHotkeyCallback(void *data, obs_hotkey_id id, obs_hotkey_t *hotkey, bool 
 		
 	}
 }
-
-void obs_module_unload(void)
-{
-	obs_log(LOG_INFO, "plugin unloaded");
-}
-
