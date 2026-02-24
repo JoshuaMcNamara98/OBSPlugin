@@ -1,4 +1,9 @@
-#include <SDL_gamecontroller.h>
+#define SDL_CONTROLLER_AXIS_LEFTX 0
+#define SDL_CONTROLLER_AXIS_LEFTY 1
+#define SDL_CONTROLLER_AXIS_RIGHTX 2
+#define SDL_CONTROLLER_AXIS_RIGHTY 3
+#define SDL_CONTROLLER_AXIS_LEFTTRIGGER 4
+#define SDL_CONTROLLER_AXIS_RIGHTTRIGGER 5
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -6,7 +11,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include "constants.h"
-#include <SDL.h>
+
 
 #define STICK_THRESHOULD 0.2
 JoystickWrapper::JoystickWrapper(QObject *parent) : QObject(parent)
@@ -81,10 +86,6 @@ void JoystickWrapper::joystickAxisChanged(const int js , const int axis , const 
 {
     qDebug()<<axis;
     qDebug()<<value;
-    int axesNum = QJoysticks::getInstance()->getNumAxes(js);
-//    qDebug()<<"Number of axes"<<axesNum;
-//    qDebug()<<(QJoysticks::getInstance()->getInputDevice(js)->axes);
-
 
     int axesNum = QJoysticks::getInstance()->getNumAxes(js);
     if(axesNum < 2) // Need at least 2 axes for XY movement
